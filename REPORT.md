@@ -2,7 +2,7 @@
 
 > 과목: Docker Tutorial 실습 과제  
 > 제출일: 2026년 5월  
-> GitHub 링크: `https://github.com/YOUR_USERNAME/lucky645-lotto` *(제출 전 실제 URL로 교체)*
+> GitHub 링크: `https://github.com/GangInHu/LOTTOSITE`
 
 ---
 
