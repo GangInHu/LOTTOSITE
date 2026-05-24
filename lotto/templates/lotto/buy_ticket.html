@@ -1,0 +1,83 @@
+{% extends 'lotto/base.html' %}
+{% block title %}복권 구매 - Lucky 645{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>🎟️ 복권 구매 - 제{{ current_round.round_number }}회</h2>
+
+  <!-- 탭 -->
+  <div style="display:flex;gap:.5rem;margin-bottom:1.5rem" id="tabs">
+    <button class="btn btn-primary" id="tab-auto" onclick="showTab('auto')">🎲 자동 번호</button>
+    <button class="btn btn-outline" id="tab-manual" onclick="showTab('manual')">✏️ 수동 번호</button>
+  </div>
+
+  <!-- 자동 -->
+  <div id="form-auto">
+    <p style="color:var(--muted);margin-bottom:1rem">시스템이 1~45 중 6개를 무작위로 선택합니다.</p>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="purchase_type" value="auto">
+      <button type="submit" class="btn btn-accent" style="font-size:1.1rem;padding:.7rem 2rem">🍀 자동 구매 (1,000원)</button>
+    </form>
+  </div>
+
+  <!-- 수동 -->
+  <div id="form-manual" style="display:none">
+    <p style="color:var(--muted);margin-bottom:1rem">1~45 사이의 숫자 6개를 입력하세요 (중복 불가).</p>
+    <form method="post" onsubmit="return validateManual()">
+      {% csrf_token %}
+      <input type="hidden" name="purchase_type" value="manual">
+      <div class="num-grid" style="max-width:400px;margin-bottom:1.2rem">
+        {% for i in "123456" %}
+        <div>
+          <label style="text-align:center;display:block;font-size:.8rem;color:var(--muted)">번호 {{ forloop.counter }}</label>
+          <input type="number" name="num{{ forloop.counter }}" min="1" max="45" required
+            style="width:100%;text-align:center;font-size:1.2rem;font-weight:700">
+        </div>
+        {% endfor %}
+      </div>
+      <!-- 번호판 선택 -->
+      <div style="margin-bottom:1.2rem">
+        <p style="font-size:.85rem;color:var(--muted);margin-bottom:.5rem">번호판에서 직접 선택:</p>
+        <div id="num-picker" style="display:flex;flex-wrap:wrap;gap:4px;max-width:500px">
+          {% for i in nums %}
+          <button type="button" onclick="toggleNum({{ i }})" id="btn{{ i }}"
+            class="ball r{% if i <= 10 %}1{% elif i <= 20 %}2{% elif i <= 30 %}3{% elif i <= 40 %}4{% else %}5{% endif %}"
+            style="cursor:pointer;opacity:.4;font-size:.78rem">{{ i }}</button>
+          {% endfor %}
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="font-size:1.1rem;padding:.7rem 2rem">✅ 수동 구매 (1,000원)</button>
+    </form>
+  </div>
+</div>
+
+<script>
+const selected = new Set();
+function showTab(t) {
+  document.getElementById('form-auto').style.display   = t==='auto'?'block':'none';
+  document.getElementById('form-manual').style.display = t==='manual'?'block':'none';
+  document.getElementById('tab-auto').className   = t==='auto'?'btn btn-primary':'btn btn-outline';
+  document.getElementById('tab-manual').className = t==='manual'?'btn btn-primary':'btn btn-outline';
+}
+function toggleNum(n) {
+  const btn = document.getElementById('btn'+n);
+  if (selected.has(n)) {
+    selected.delete(n);
+    btn.style.opacity = '.4';
+  } else {
+    if (selected.size >= 6) { alert('6개만 선택 가능합니다.'); return; }
+    selected.add(n);
+    btn.style.opacity = '1';
+  }
+  const sorted = [...selected].sort((a,b)=>a-b);
+  const inputs = document.querySelectorAll('input[name^="num"]');
+  inputs.forEach((inp,i) => inp.value = sorted[i]||'');
+}
+function validateManual() {
+  const vals = [...document.querySelectorAll('input[name^="num"]')].map(i=>parseInt(i.value));
+  if (vals.some(v=>isNaN(v)||v<1||v>45)) { alert('1~45 사이 숫자를 모두 입력하세요.'); return false; }
+  if (new Set(vals).size!==6) { alert('중복 번호가 있습니다.'); return false; }
+  return true;
+}
+</script>
+{% endblock %}

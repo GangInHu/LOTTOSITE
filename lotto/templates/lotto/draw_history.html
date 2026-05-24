@@ -1,0 +1,31 @@
+{% extends 'lotto/base.html' %}
+{% block title %}당첨 이력 - Lucky 645{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>📜 역대 당첨번호</h2>
+  {% if rounds %}
+  <table>
+    <tr><th>회차</th><th>추첨일</th><th>당첨번호</th><th>보너스</th></tr>
+    {% for r in rounds %}
+    <tr>
+      <td><strong>제{{ r.round_number }}회</strong></td>
+      <td>{{ r.draw_date }}</td>
+      <td>
+        {% for n in r.get_numbers %}
+          {% if n <= 10 %}<span class="ball r1" style="width:28px;height:28px;font-size:.75rem">{{ n }}</span>
+          {% elif n <= 20 %}<span class="ball r2" style="width:28px;height:28px;font-size:.75rem">{{ n }}</span>
+          {% elif n <= 30 %}<span class="ball r3" style="width:28px;height:28px;font-size:.75rem">{{ n }}</span>
+          {% elif n <= 40 %}<span class="ball r4" style="width:28px;height:28px;font-size:.75rem">{{ n }}</span>
+          {% else %}<span class="ball r5" style="width:28px;height:28px;font-size:.75rem">{{ n }}</span>
+          {% endif %}
+        {% endfor %}
+      </td>
+      <td><span class="ball bonus" style="width:28px;height:28px;font-size:.75rem">{{ r.bonus }}</span></td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p style="color:var(--muted);text-align:center;padding:2rem">아직 추첨 결과가 없습니다.</p>
+  {% endif %}
+</div>
+{% endblock %}

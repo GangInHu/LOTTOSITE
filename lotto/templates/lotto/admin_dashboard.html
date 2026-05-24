@@ -1,0 +1,56 @@
+{% extends 'lotto/base.html' %}
+{% block title %}관리자 대시보드 - Lucky 645{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>⚙️ 관리자 대시보드</h2>
+  <div style="display:flex;gap:.5rem;margin-bottom:1.5rem;flex-wrap:wrap">
+    <a href="/admin-panel/sales/" class="btn btn-primary">📊 판매 내역</a>
+    <a href="/admin-panel/winners/" class="btn btn-success">🏆 당첨 내역</a>
+    <a href="/admin-panel/create-round/" class="btn btn-outline">➕ 새 회차 생성</a>
+    <a href="/admin/" class="btn btn-outline">Django Admin</a>
+  </div>
+
+  <!-- 통계 -->
+  <div class="stat-grid">
+    <div class="stat-box"><div class="num">{{ stats.total_tickets }}</div><div class="lbl">총 판매 티켓</div></div>
+    <div class="stat-box"><div class="num">{{ stats.total_revenue|floatformat:0 }}</div><div class="lbl">총 매출 (원)</div></div>
+    <div class="stat-box"><div class="num">{{ stats.drawn_rounds }}/{{ stats.total_rounds }}</div><div class="lbl">추첨 완료 / 전체 회차</div></div>
+    <div class="stat-box"><div class="num">{{ stats.total_winners }}</div><div class="lbl">총 당첨자 수</div></div>
+  </div>
+</div>
+
+<!-- 회차 목록 -->
+<div class="card">
+  <h2>📋 회차 목록</h2>
+  <table>
+    <tr><th>회차</th><th>상태</th><th>추첨일</th><th>당첨번호</th><th>보너스</th><th>액션</th></tr>
+    {% for r in rounds %}
+    <tr>
+      <td><strong>제{{ r.round_number }}회</strong></td>
+      <td>
+        {% if r.is_drawn %}<span style="color:var(--success)">✅ 추첨완료</span>
+        {% else %}<span style="color:orange">⏳ 대기중</span>{% endif %}
+      </td>
+      <td>{{ r.draw_date|default:"-" }}</td>
+      <td>
+        {% if r.is_drawn %}
+          {% for n in r.get_numbers %}
+            <span class="ball {% if n <= 10 %}r1{% elif n <= 20 %}r2{% elif n <= 30 %}r3{% elif n <= 40 %}r4{% else %}r5{% endif %}"
+              style="width:24px;height:24px;font-size:.7rem">{{ n }}</span>
+          {% endfor %}
+        {% else %}-{% endif %}
+      </td>
+      <td>
+        {% if r.is_drawn %}<span class="ball bonus" style="width:24px;height:24px;font-size:.7rem">{{ r.bonus }}</span>
+        {% else %}-{% endif %}
+      </td>
+      <td>
+        {% if not r.is_drawn %}
+        <a href="/admin-panel/draw/{{ r.id }}/" class="btn btn-danger btn-sm">추첨 실행</a>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

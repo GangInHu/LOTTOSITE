@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}🍀 Lucky 645 로또{% endblock %}</title>
+<style>
+  :root {
+    --primary: #1a237e;
+    --accent: #f9a825;
+    --bg: #f5f5f5;
+    --card: #ffffff;
+    --text: #212121;
+    --muted: #757575;
+    --success: #2e7d32;
+    --danger: #c62828;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* NAV */
+  nav { background: var(--primary); color: #fff; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 60px; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
+  nav .brand { font-size: 1.4rem; font-weight: 700; text-decoration: none; color: var(--accent); }
+  nav ul { list-style: none; display: flex; gap: 1.2rem; }
+  nav a { color: #e8eaf6; text-decoration: none; font-size: .95rem; transition: color .2s; }
+  nav a:hover { color: var(--accent); }
+
+  /* MAIN */
+  main { max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+
+  /* MESSAGES */
+  .messages { margin-bottom: 1rem; }
+  .msg { padding: .75rem 1rem; border-radius: 6px; margin-bottom: .5rem; font-weight: 500; }
+  .msg.success { background: #e8f5e9; color: var(--success); border-left: 4px solid var(--success); }
+  .msg.error   { background: #ffebee; color: var(--danger);  border-left: 4px solid var(--danger); }
+  .msg.warning { background: #fff8e1; color: #f57f17;        border-left: 4px solid #f57f17; }
+  .msg.info    { background: #e3f2fd; color: #1565c0;        border-left: 4px solid #1565c0; }
+
+  /* CARD */
+  .card { background: var(--card); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
+  .card h2 { color: var(--primary); margin-bottom: 1rem; font-size: 1.3rem; border-bottom: 2px solid var(--accent); padding-bottom: .5rem; }
+
+  /* BUTTONS */
+  .btn { display: inline-block; padding: .55rem 1.2rem; border-radius: 6px; border: none; cursor: pointer; font-size: .9rem; font-weight: 600; text-decoration: none; transition: opacity .2s, transform .1s; }
+  .btn:hover { opacity: .88; transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn-primary  { background: var(--primary); color: #fff; }
+  .btn-accent   { background: var(--accent); color: #000; }
+  .btn-success  { background: var(--success); color: #fff; }
+  .btn-danger   { background: var(--danger); color: #fff; }
+  .btn-outline  { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
+  .btn-sm { padding: .3rem .7rem; font-size: .82rem; }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  th { background: var(--primary); color: #fff; padding: .65rem .75rem; text-align: left; }
+  td { padding: .6rem .75rem; border-bottom: 1px solid #eee; }
+  tr:hover td { background: #f9f9ff; }
+
+  /* LOTTO BALLS */
+  .ball { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; font-size: .82rem; font-weight: 700; color: #fff; margin: 2px; }
+  .ball.r1  { background: #ef5350; }
+  .ball.r2  { background: #ff9800; }
+  .ball.r3  { background: #fdd835; color: #333; }
+  .ball.r4  { background: #66bb6a; }
+  .ball.r5  { background: #42a5f5; }
+  .ball.bonus { background: #ab47bc; border: 2px dashed #fff; }
+
+  /* FORM */
+  .form-group { margin-bottom: 1rem; }
+  .form-group label { display: block; margin-bottom: .3rem; font-weight: 600; color: var(--primary); }
+  .form-group input { width: 100%; padding: .55rem .8rem; border: 2px solid #ddd; border-radius: 6px; font-size: 1rem; transition: border-color .2s; }
+  .form-group input:focus { outline: none; border-color: var(--primary); }
+  .num-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: .5rem; }
+  .num-grid input { text-align: center; font-size: 1.1rem; font-weight: 700; }
+
+  /* RANK BADGE */
+  .rank-badge { display: inline-block; padding: .2rem .6rem; border-radius: 20px; font-size: .78rem; font-weight: 700; }
+  .rank-1 { background: #ffd700; color: #333; }
+  .rank-2 { background: #c0c0c0; color: #333; }
+  .rank-3 { background: #cd7f32; color: #fff; }
+  .rank-4 { background: #4caf50; color: #fff; }
+  .rank-5 { background: #2196f3; color: #fff; }
+  .rank-0 { background: #e0e0e0; color: #666; }
+
+  /* HERO */
+  .hero { background: linear-gradient(135deg, var(--primary) 0%, #283593 60%, #1a237e 100%); color: #fff; text-align: center; padding: 3rem 1rem; border-radius: 16px; margin-bottom: 2rem; }
+  .hero h1 { font-size: 2.5rem; margin-bottom: .5rem; }
+  .hero p { font-size: 1.1rem; opacity: .85; }
+
+  /* STATS GRID */
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .stat-box { background: var(--card); border-radius: 10px; padding: 1.2rem; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,.07); }
+  .stat-box .num { font-size: 1.8rem; font-weight: 700; color: var(--primary); }
+  .stat-box .lbl { font-size: .82rem; color: var(--muted); margin-top: .2rem; }
+
+  footer { text-align: center; padding: 2rem; color: var(--muted); font-size: .85rem; }
+</style>
+</head>
+<body>
+<nav>
+  <a class="brand" href="/">🍀 Lucky 645</a>
+  <ul>
+    <li><a href="/">홈</a></li>
+    <li><a href="/buy/">복권구매</a></li>
+    <li><a href="/my-tickets/">내 티켓</a></li>
+    <li><a href="/history/">당첨이력</a></li>
+    {% if user.is_staff %}
+    <li><a href="/admin-panel/" style="color:#ffd54f">관리자</a></li>
+    {% endif %}
+    {% if user.is_authenticated %}
+    <li><a href="/logout/">로그아웃({{ user.username }})</a></li>
+    {% else %}
+    <li><a href="/login/">로그인</a></li>
+    <li><a href="/register/">회원가입</a></li>
+    {% endif %}
+  </ul>
+</nav>
+
+<main>
+  {% if messages %}
+  <div class="messages">
+    {% for msg in messages %}
+    <div class="msg {{ msg.tags }}">{{ msg }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</main>
+
+<footer>© 2026 Lucky 645 Lotto · Django + Docker 프로젝트</footer>
+</body>
+</html>

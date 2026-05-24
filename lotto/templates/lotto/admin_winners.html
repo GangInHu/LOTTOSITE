@@ -1,0 +1,44 @@
+{% extends 'lotto/base.html' %}
+{% block title %}당첨 내역 - Lucky 645{% endblock %}
+{% block content %}
+<!-- 등수별 요약 -->
+<div class="card">
+  <h2>🏆 등수별 당첨 현황</h2>
+  <a href="/admin-panel/" class="btn btn-outline btn-sm" style="margin-bottom:1rem">← 대시보드</a>
+  <div class="stat-grid">
+    {% for s in rank_summary %}
+    <div class="stat-box">
+      <span class="rank-badge rank-{{ s.rank }}" style="font-size:1rem;padding:.3rem .9rem">{{ s.rank }}등</span>
+      <div class="num" style="margin-top:.5rem">{{ s.count }}명</div>
+      <div class="lbl">총 {{ s.total_prize|floatformat:0 }}원</div>
+    </div>
+    {% empty %}
+    <p style="color:var(--muted)">당첨자가 없습니다.</p>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- 당첨자 목록 -->
+<div class="card">
+  <h2>📋 당첨자 목록</h2>
+  <table>
+    <tr><th>등수</th><th>구매자</th><th>회차</th><th>번호</th><th>당첨금</th><th>구매일</th></tr>
+    {% for t in winners %}
+    <tr>
+      <td><span class="rank-badge rank-{{ t.rank }}">{{ t.rank }}등</span></td>
+      <td>{{ t.user.username }}</td>
+      <td>제{{ t.round.round_number }}회</td>
+      <td>
+        {% for n in t.get_numbers %}
+        <span style="font-size:.82rem;font-weight:600">{{ n }}{% if not forloop.last %}, {% endif %}</span>
+        {% endfor %}
+      </td>
+      <td><strong style="color:var(--success)">{{ t.prize|floatformat:0 }}원</strong></td>
+      <td style="font-size:.82rem">{{ t.purchase_date|date:"Y-m-d H:i" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6" style="text-align:center;color:var(--muted);padding:2rem">당첨자가 없습니다.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

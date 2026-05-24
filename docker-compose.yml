@@ -1,0 +1,66 @@
+version: '3.9'
+
+services:
+
+  # ── PostgreSQL 데이터베이스 ──
+  db:
+    image: postgres:15-alpine
+    container_name: lotto_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: lottodb
+      POSTGRES_USER: lottouser
+      POSTGRES_PASSWORD: lottopass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - lotto_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lottouser -d lottodb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Django 웹 애플리케이션 ──
+  web:
+    build: .
+    container_name: lotto_web
+    restart: unless-stopped
+    environment:
+      SECRET_KEY: "django-super-secret-key-change-in-prod-2026"
+      DEBUG: "False"
+      DB_NAME: lottodb
+      DB_USER: lottouser
+      DB_PASSWORD: lottopass
+      DB_HOST: db
+      DB_PORT: "5432"
+    volumes:
+      - static_volume:/app/staticfiles
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - lotto_net
+
+  # ── Nginx 리버스 프록시 ──
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: lotto_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - static_volume:/app/staticfiles:ro
+    depends_on:
+      - web
+    networks:
+      - lotto_net
+
+networks:
+  lotto_net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  static_volume:

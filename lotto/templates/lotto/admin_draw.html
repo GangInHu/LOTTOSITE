@@ -1,0 +1,15 @@
+{% extends 'lotto/base.html' %}
+{% block title %}추첨 실행 - Lucky 645{% endblock %}
+{% block content %}
+<div style="max-width:480px;margin:0 auto">
+<div class="card">
+  <h2>🎰 추첨 실행 - 제{{ round.round_number }}회</h2>
+  <p style="color:var(--muted);margin-bottom:1.5rem">이 회차에 대해 추첨을 실행합니다.<br>추첨 후에는 취소할 수 없습니다.</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger" style="font-size:1.1rem;padding:.7rem 2rem">🎲 추첨 실행</button>
+    <a href="/admin-panel/" class="btn btn-outline" style="margin-left:.5rem">취소</a>
+  </form>
+</div>
+</div>
+{% endblock %}

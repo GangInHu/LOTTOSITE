@@ -1,0 +1,65 @@
+{% extends 'lotto/base.html' %}
+{% block title %}홈 - Lucky 645{% endblock %}
+{% block content %}
+<div class="hero">
+  <h1>🍀 Lucky 645 로또</h1>
+  <p>행운의 번호를 선택하고 당신의 꿈을 실현하세요!</p>
+  {% if user.is_authenticated %}
+  <br>
+  <a href="/buy/" class="btn btn-accent" style="margin-top:1rem">지금 구매하기</a>
+  {% else %}
+  <br>
+  <a href="/register/" class="btn btn-accent" style="margin-top:1rem">회원가입하고 시작하기</a>
+  {% endif %}
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+
+  <!-- 현재 회차 -->
+  <div class="card">
+    <h2>🎯 현재 판매 회차</h2>
+    {% if current_round %}
+    <p style="font-size:1.6rem;font-weight:700;color:var(--primary)">제 {{ current_round.round_number }}회</p>
+    <p style="color:var(--muted);margin-top:.3rem">복권 1장 = 1,000원</p>
+    <a href="/buy/" class="btn btn-primary" style="margin-top:1rem">복권 구매</a>
+    {% else %}
+    <p style="color:var(--muted)">현재 판매 중인 회차가 없습니다.</p>
+    {% endif %}
+  </div>
+
+  <!-- 최신 당첨번호 -->
+  <div class="card">
+    <h2>🏆 최신 당첨번호</h2>
+    {% if latest_drawn %}
+    <p style="color:var(--muted);margin-bottom:.7rem">제 {{ latest_drawn.round_number }}회 ({{ latest_drawn.draw_date }})</p>
+    {% for n in latest_drawn.get_numbers %}
+      {% if n <= 10 %}<span class="ball r1">{{ n }}</span>
+      {% elif n <= 20 %}<span class="ball r2">{{ n }}</span>
+      {% elif n <= 30 %}<span class="ball r3">{{ n }}</span>
+      {% elif n <= 40 %}<span class="ball r4">{{ n }}</span>
+      {% else %}<span class="ball r5">{{ n }}</span>
+      {% endif %}
+    {% endfor %}
+    <span style="margin:0 .3rem;color:var(--muted)">+</span>
+    <span class="ball bonus">{{ latest_drawn.bonus }}</span>
+    <br><a href="/history/" class="btn btn-outline btn-sm" style="margin-top:.8rem">전체 이력 보기</a>
+    {% else %}
+    <p style="color:var(--muted)">아직 추첨 결과가 없습니다.</p>
+    {% endif %}
+  </div>
+
+</div>
+
+<!-- 등수 안내 -->
+<div class="card">
+  <h2>📋 당첨 등수 안내</h2>
+  <table>
+    <tr><th>등수</th><th>조건</th><th>당첨금 (예시)</th></tr>
+    <tr><td><span class="rank-badge rank-1">1등</span></td><td>6개 번호 일치</td><td>약 20억 원</td></tr>
+    <tr><td><span class="rank-badge rank-2">2등</span></td><td>5개 + 보너스 일치</td><td>약 6,000만 원</td></tr>
+    <tr><td><span class="rank-badge rank-3">3등</span></td><td>5개 번호 일치</td><td>약 150만 원</td></tr>
+    <tr><td><span class="rank-badge rank-4">4등</span></td><td>4개 번호 일치</td><td>5만 원</td></tr>
+    <tr><td><span class="rank-badge rank-5">5등</span></td><td>3개 번호 일치</td><td>5,000 원</td></tr>
+  </table>
+</div>
+{% endblock %}
